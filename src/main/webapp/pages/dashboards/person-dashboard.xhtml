@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+    <title>Person Dashboard</title>
+    <script>
+
+    </script>
+</h:head>
+<h:body>
+    <div id="page-wrap"  style="text-align: center; ">
+        <h:graphicImage library="img" name="mindy.png"/>
+        <br/>
+        <p:dataTable value="#{personBean.persons}"
+                     var="person"
+                     >
+            <p:column headerText="Name">
+                <h:outputText value="#{person.name}"/>
+            </p:column>
+            <p:column headerText="Login">
+                <h:outputText value="#{person.login}"/>
+            </p:column>
+            <p:column headerText="City">
+                <h:outputText value="#{person.city}"/>
+            </p:column>
+            <p:column headerText="Position">
+                <h:outputText value="#{person.position}"/>
+            </p:column>
+            <p:column headerText="PE/Payroll">
+                <h:outputText value="#{person.pePayroll}"/>
+            </p:column>
+            <p:column headerText="Hours">
+                <h:outputText value="#{person.hoursType}"/>
+            </p:column>
+            <p:column headerText="Date of Employment">
+                <h:outputText value="#{person.dateOfEmpoyment}"/>
+            </p:column>
+            <p:column headerText="Date of Leave">
+                <h:outputText value="#{person.dateOfLeave}"/>
+            </p:column>
+            <p:column headerText="Schedule">
+                <h:outputText value="#{person.schedule}"/>
+            </p:column>
+            <p:column headerText="Salary Netto">
+                <h:outputText value="#{person.salaryNetto}"/>
+            </p:column>
+        </p:dataTable>
+    </div>
+</h:body>
+</html>
