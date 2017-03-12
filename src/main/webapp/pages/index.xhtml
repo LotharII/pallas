@@ -12,12 +12,13 @@
 <h:body>
 
 
-    <div id="page-wrap" class="green" style="text-align: center">
+    <div id="page-wrap" class="green">
         <h:form id="overviewForm">
             <h:graphicImage library="img" name="mindy.png"/>
             <h2>Hey! Mindy Supports rules!</h2>
             <br/>
-            <h:commandButton value="Person Dashboard" action="#{overview.personDashboard}"/>
+            <h:commandButton style="margin-right: 30px" value="Person Dashboard" action="#{navigation.goToPersonDashboard}"/>
+            <h:commandButton value="Working hours" action="#{navigation.goToHoursType}"/>
         </h:form>
     </div>
 </h:body>

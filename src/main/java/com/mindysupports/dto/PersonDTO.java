@@ -10,8 +10,9 @@ public class PersonDTO {
     private String city;
     private String position;
     private String pePayroll;
-    private int hoursType;
-    private Date dateOfEmpoyment;
+    private int hoursAmount;
+    private String hoursType;
+    private Date dateOfEmployment;
     private Date dateOfLeave;
     private String schedule;
     private double salaryNetto;
@@ -64,20 +65,20 @@ public class PersonDTO {
         this.pePayroll = pePayroll;
     }
 
-    public int getHoursType() {
-        return hoursType;
+    public int getHoursAmount() {
+        return hoursAmount;
     }
 
-    public void setHoursType(int hoursType) {
-        this.hoursType = hoursType;
+    public void setHoursAmount(int hoursAmount) {
+        this.hoursAmount = hoursAmount;
     }
 
-    public Date getDateOfEmpoyment() {
-        return dateOfEmpoyment;
+    public Date getDateOfEmployment() {
+        return dateOfEmployment;
     }
 
-    public void setDateOfEmpoyment(Date dateOfEmpoyment) {
-        this.dateOfEmpoyment = dateOfEmpoyment;
+    public void setDateOfEmployment(Date dateOfEmployment) {
+        this.dateOfEmployment = dateOfEmployment;
     }
 
     public Date getDateOfLeave() {
@@ -102,5 +103,13 @@ public class PersonDTO {
 
     public void setSalaryNetto(double salaryNetto) {
         this.salaryNetto = salaryNetto;
+    }
+
+    public String getHoursType() {
+        return hoursType;
+    }
+
+    public void setHoursType(String hoursType) {
+        this.hoursType = hoursType;
     }
 }

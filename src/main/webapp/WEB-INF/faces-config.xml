@@ -12,10 +12,25 @@
             <to-view-id>/pages/dashboards/person-dashboard.xhtml</to-view-id>
             <redirect/>
         </navigation-case>
+        <navigation-case>
+            <from-outcome>hoursType</from-outcome>
+            <to-view-id>/pages/dashboards/hours-type.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
 
     </navigation-rule>
     <navigation-rule>
         <from-view-id>/pages/dashboards/person-dashboard.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>overview</from-outcome>
+            <to-view-id>/pages/index.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/pages/dashboards/hours-type.xhtml</from-view-id>
         <navigation-case>
             <from-outcome>overview</from-outcome>
             <to-view-id>/pages/index.xhtml</to-view-id>

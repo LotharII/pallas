@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core">
+<h:head>
+    <title>Person Dashboard</title>
+    <script>
+
+    </script>
+    <h:outputStylesheet library = "css" name="style.css"/>
+</h:head>
+<h:body>
+    <div id="page-wrap" >
+        <h:graphicImage library="img" name="mindy.png"/>
+        <br/>
+        <h:form id="hoursForm">
+            <p:dataTable id="hoursTable"
+                         value="#{hoursTypeBean.hourTypes}"
+                         var="hours"
+                         tableStyle="width:auto">
+                <p:column headerText="Hours Type">
+                    <h:outputText value="#{hours.type}"/>
+                </p:column>
+                <p:column headerText="Hours Amount">
+                    <h:outputText value="#{hours.amount}"/>
+                </p:column>
+                <p:column headerText="Edit">
+                    <p:commandLink action="#{hoursTypeBean.showEditDialog(hours)}" update="hoursForm:editHours">
+                        <h:graphicImage library="img" name="edit.png" />
+                    </p:commandLink>
+                </p:column>
+                <p:column headerText="Delete">
+                    <p:commandLink action="#{hoursTypeBean.delete(hours)}">
+                        <h:graphicImage library="img" name="delete.png" />
+                    </p:commandLink>
+                </p:column>
+            </p:dataTable>
+
+            <p:dialog id="editHours" widgetVar="editWidget" >
+                <h:outputText value="Edit Hours Type"/>
+                <br/>
+                <p:panelGrid columns="2">
+                    <h:outputText value="Hours Type:"/>
+                    <h:outputText value="#{hoursTypeBean.editHours.type}"/>
+                    <h:outputText value="Hours Amount:"/>
+                    <p:inputText value="#{hoursTypeBean.editHours.amount}"/>
+                </p:panelGrid>
+                <br/>
+                <span style="text-align: left">
+                    <p:commandButton value="Save Changes" action="#{hoursTypeBean.updateHoursType()}"
+                                     onclick="editHours.hide();" />
+                </span>
+                <span style="text-align: right">
+                    <p:commandButton value="Cancel" action="#{hoursTypeBean.hideEditDialog()}"
+                                     onclick="editHours.hide();"/>
+                </span>
+            </p:dialog>
+            <p:dialog id="addHours" widgetVar="addWidget" >
+                <h:outputText value="Add New Hours Type"/>
+                <br/>
+                <p:panelGrid columns="2">
+                    <h:outputText value="Hours Type:"/>
+                    <p:inputText value="#{hoursTypeBean.addType.type}"/>
+                    <h:outputText value="Hours Amount:"/>
+                    <p:inputText value="#{hoursTypeBean.addType.amount}"/>
+                </p:panelGrid>
+                <br/>
+                <span style="text-align: left">
+                    <p:commandButton value="Add New Type" action="#{hoursTypeBean.addHourType()}"
+                                     onclick="addHours.hide();" />
+                </span>
+                <span style="text-align: right">
+                    <p:commandButton value="Cancel" action="#{hoursTypeBean.hideEditDialog()}"
+                                     onclick="addHours.hide();"/>
+                </span>
+             </p:dialog>
+            <br/>
+            <div style="text-align: left;">
+                <p:commandLink action="#{hoursTypeBean.showAddDialog()}" update="hoursForm:addHours">
+                    <h:graphicImage library="img" name="Add.png" />
+                </p:commandLink>
+            </div>
+            <br/>
+            <div style="text-align: left;">
+                <h:commandButton value="Overview" action="#{navigation.goToOverview()}"/>
+            </div>
+        </h:form>
+    </div>
+</h:body>
+</html>

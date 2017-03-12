@@ -1,51 +1,147 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core">
 <h:head>
     <title>Person Dashboard</title>
     <script>
 
     </script>
+    <h:outputStylesheet library = "css" name="style.css"/>
 </h:head>
 <h:body>
-    <div id="page-wrap"  style="text-align: center; ">
+    <div id="page-wrap" >
         <h:graphicImage library="img" name="mindy.png"/>
         <br/>
-        <p:dataTable value="#{personBean.persons}"
-                     var="person"
-                     >
-            <p:column headerText="Name">
-                <h:outputText value="#{person.name}"/>
-            </p:column>
-            <p:column headerText="Login">
-                <h:outputText value="#{person.login}"/>
-            </p:column>
-            <p:column headerText="City">
-                <h:outputText value="#{person.city}"/>
-            </p:column>
-            <p:column headerText="Position">
-                <h:outputText value="#{person.position}"/>
-            </p:column>
-            <p:column headerText="PE/Payroll">
-                <h:outputText value="#{person.pePayroll}"/>
-            </p:column>
-            <p:column headerText="Hours">
-                <h:outputText value="#{person.hoursType}"/>
-            </p:column>
-            <p:column headerText="Date of Employment">
-                <h:outputText value="#{person.dateOfEmpoyment}"/>
-            </p:column>
-            <p:column headerText="Date of Leave">
-                <h:outputText value="#{person.dateOfLeave}"/>
-            </p:column>
-            <p:column headerText="Schedule">
-                <h:outputText value="#{person.schedule}"/>
-            </p:column>
-            <p:column headerText="Salary Netto">
-                <h:outputText value="#{person.salaryNetto}"/>
-            </p:column>
-        </p:dataTable>
+        <h:form id="personForm" enctype="multipart/form-data">
+            <p:accordionPanel id="search">
+                <p:tab id="searchTab" title="Search">
+                    <p:panelGrid id="searchGrid" columns="6">
+                        <h:outputText style="margin-right: 20px" value="Name:"/>
+                        <p:inputText style="margin-right: 20px" value="#{personBean.searchCriteria.name}"/>
+                        <h:outputText style="margin-right: 20px" value="Hours Type:"/>
+                        <p:selectOneMenu value="#{personBean.searchCriteria.hoursType}">
+                            <f:selectItem itemLabel="Select hours type" value="#{null}"/>;
+                            <f:selectItems value="#{personBean.hourTypes}" var="type"
+                                           itemLabel="#{type.type}" itemValue="#{type.type}"/>
+                        </p:selectOneMenu>
+                        <h:outputText style="margin-right: 20px" value="Login:"/>
+                        <p:inputText style="margin-right: 20px" value="#{personBean.searchCriteria.login}"/>
+                        <h:outputText style="margin-right: 20px" value="Position:"/>
+                        <p:inputText style="margin-right: 20px" value="#{personBean.searchCriteria.position}"/>
+                        <h:outputText style="margin-right: 20px" value="PE/Payroll:"/>
+                        <p:inputText style="margin-right: 20px" value="#{personBean.searchCriteria.pePayroll}"/>
+                        <h:outputText style="margin-right: 20px" value="Schedule:"/>
+                        <p:inputText style="margin-right: 20px" value="#{personBean.searchCriteria.schedule}"/>
+                        <h:outputText style="margin-right: 20px" value="Date of Employment:"/>
+                        <p:calendar  showOn="button"  value="#{personBean.searchCriteria.dateOfEmployment}"
+                                     pattern="dd/MM/yyyy" />
+                        <h:outputText style="margin-right: 20px" value="Date of Leave:"/>
+                        <p:calendar  showOn="button"  value="#{personBean.searchCriteria.dateOfLeave}"
+                                     pattern="dd/MM/yyyy" />
+                    </p:panelGrid>
+                    <br/>
+                    <div style="text-align: left">
+                        <p:commandButton style="margin-right: 20px;" value="Search" action="#{personBean.searchPersons()}" update="personForm:personTable"/>
+                        <p:commandButton  value="Clear Search Results" action="#{personBean.clear()}" update="personForm:personTable personForm:search:searchGrid"/>
+                    </div>
+                </p:tab>
+            </p:accordionPanel>
+            <br/>
+            <p:dataTable id="personTable"
+                         value="#{personBean.persons}"
+                         var="person"
+                         tableStyle="width:auto">
+                <p:column headerText="Name">
+                    <h:outputText value="#{person.name}"/>
+                </p:column>
+                <p:column headerText="Login">
+                    <h:outputText value="#{person.login}"/>
+                </p:column>
+                <p:column headerText="City">
+                    <h:outputText value="#{person.city}"/>
+                </p:column>
+                <p:column headerText="Position">
+                    <h:outputText value="#{person.position}"/>
+                </p:column>
+                <p:column headerText="PE/Payroll">
+                    <h:outputText value="#{person.pePayroll}"/>
+                </p:column>
+                <p:column headerText="Hours">
+                    <h:outputText value="#{person.hoursAmount}"/>
+                </p:column>
+                <p:column headerText="Date of Employment">
+                    <h:outputText value="#{person.dateOfEmployment}" >
+                        <f:convertDateTime type="date" pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+
+                </p:column>
+                <p:column headerText="Date of Leave">
+                    <h:outputText value="#{person.dateOfLeave}" >
+                        <f:convertDateTime type="date" pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Schedule">
+                    <h:outputText value="#{person.schedule}"/>
+                </p:column>
+                <p:column headerText="Action">
+                    <p:commandLink style="margin-right: 10px;" action="#{personBean.showEditDialog(person)}" update="personForm:editPerson">
+                        <h:graphicImage library="img" name="edit.png" />
+                    </p:commandLink>
+                    <p:commandLink action="#{personBean.deletePeson(person)}" update="personForm:personTable">
+                        <p:confirm header="Confirmation" message="Are you sure?" icon="ui-icon-alert" />
+                        <h:graphicImage library="img" name="delete.png" />
+                    </p:commandLink>
+                </p:column>
+
+            </p:dataTable>
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+            </p:confirmDialog>
+
+            <br/>
+            <div style="text-align: left">
+                <p:fileUpload mode="simple" value="#{personBean.uploadedFile}" />
+                <p:commandButton value="Upload" action="#{personBean.upload()}" ajax="false" />
+            </div>
+            <p:dialog id="editPerson" widgetVar="editWidget" >
+                <p:panelGrid columns="2">
+                    <h:outputText value="Name:"/>
+                    <p:inputText value="#{personBean.editPerson.name}"/>
+                    <h:outputText value="Login:"/>
+                    <p:inputText value="#{personBean.editPerson.login}"/>
+                    <h:outputText value="City:"/>
+                    <p:inputText value="#{personBean.editPerson.city}"/>
+                    <h:outputText value="Position:"/>
+                    <p:inputText value="#{personBean.editPerson.position}"/>
+                    <h:outputText value="PE/Payroll"/>
+                    <p:inputText value="#{personBean.editPerson.pePayroll}"/>
+                    <h:outputText value="Hours type:"/>
+                    <p:selectOneMenu value="#{personBean.editPerson.hoursType}">
+                        <f:selectItems value="#{personBean.hourTypes}" var="type"
+                            itemLabel="#{type.type}" itemValue="#{type.type}"/>
+                    </p:selectOneMenu>
+                    <h:outputText value="Date of Employment:"/>
+                    <p:calendar  showOn="button"  value="#{personBean.editPerson.dateOfEmployment}"
+                                 pattern="dd/MM/yyyy" />
+                    <h:outputText value="Date of Leave:"/>
+                    <p:calendar  showOn="button"  value="#{personBean.editPerson.dateOfLeave}"
+                                 pattern="dd/MM/yyyy" />
+                    <h:outputText value="Schedule:"/>
+                    <p:inputText value="#{personBean.editPerson.schedule}"/>
+                </p:panelGrid>
+                <p:commandButton value="Save Changes" action="#{personBean.updatePerson()}"
+                                 onclick="editPerson.hide();" />
+                <p:commandButton value="Cancel" action="#{personBean.hideEditDialog()}"
+                                 onclick="editPerson.hide();"/>
+
+            </p:dialog>
+            <br/>
+            <div style="text-align: left;">
+                <h:commandButton value="Overview" action="#{navigation.goToOverview()}"/>
+            </div>
+        </h:form>
     </div>
 </h:body>
 </html>

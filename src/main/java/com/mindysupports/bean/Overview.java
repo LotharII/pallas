@@ -9,7 +9,4 @@ import javax.faces.bean.SessionScoped;
 @ManagedBean(name = "overview")
 public class Overview {
 
-    public String personDashboard(){
-        return NavigationPath.PERSON_DASHBOARD;
-    }
 }
