@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
       xmlns:f = "http://java.sun.com/jsf/core">
 <h:head>
     <title>Mindy Supports</title>
@@ -17,8 +18,8 @@
             <h:graphicImage library="img" name="mindy.png"/>
             <h2>Hey! Mindy Supports rules!</h2>
             <br/>
-            <h:commandButton style="margin-right: 30px" value="Person Dashboard" action="#{navigation.goToPersonDashboard}"/>
-            <h:commandButton value="Working hours" action="#{navigation.goToHoursType}"/>
+            <p:commandButton style="margin-right: 30px" value="Person Dashboard" action="#{navigation.goToPersonDashboard}"/>
+            <p:commandButton value="Working hours" action="#{navigation.goToHoursType}"/>
         </h:form>
     </div>
 </h:body>

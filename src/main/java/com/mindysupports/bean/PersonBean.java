@@ -6,22 +6,21 @@ import com.mindysupports.dto.PersonSearchCriteria;
 import com.mindysupports.util.DBUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.context.RequestContext;
-import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.sql.*;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,13 +33,50 @@ public class PersonBean {
 
     private List<PersonDTO> persons = new ArrayList<PersonDTO>();
     private PersonDTO editPerson = new PersonDTO();
+    private PersonDTO addedPerson = new PersonDTO();
     private List<HourTypeDTO> hourTypes = new ArrayList<HourTypeDTO>();
     private PersonSearchCriteria searchCriteria = new PersonSearchCriteria();
     private UploadedFile uploadedFile;
+    private StreamedContent file;
 
     public PersonBean(){
         searchPersons();
         searchHourTypes();
+    }
+
+    public void addPerson(){
+        Connection connection = DBUtils.getConnection();
+        PreparedStatement stmt = null;
+        try {
+            String query = "INSERT INTO pallas.person (login, person_name, city, position, " +
+                    "pe_payroll, hours_type, date_of_employment, date_of_leave, schedule) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            stmt = connection.prepareStatement(query);
+            stmt.setString(1, addedPerson.getLogin());
+            stmt.setString(2, addedPerson.getName());
+            stmt.setString(3, addedPerson.getCity());
+            stmt.setString(4, addedPerson.getPosition());
+            stmt.setString(5, addedPerson.getPePayroll());
+            stmt.setString(6, addedPerson.getHoursType());
+            stmt.setTimestamp(7, new Timestamp(addedPerson.getDateOfEmployment().getTime()));
+            if (addedPerson.getDateOfLeave() != null){
+                stmt.setTimestamp(8, new Timestamp(addedPerson.getDateOfLeave().getTime()));
+            } else {
+                stmt.setNull(8, Types.TIMESTAMP);
+            }
+            stmt.setString(9, addedPerson.getSchedule());
+            stmt.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                stmt.close();
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        searchPersons();
     }
 
     private void searchHourTypes(){
@@ -84,10 +120,9 @@ public class PersonBean {
             person.setPosition(row.getCell(3).getStringCellValue());
             person.setPePayroll(row.getCell(4).getStringCellValue());
             person.setHoursType(row.getCell(5).getStringCellValue());
-            SimpleDateFormat parser=new SimpleDateFormat("dd.MM.yyyy");
-            Date date = parser.parse(row.getCell(6).getStringCellValue());
+            Date date = row.getCell(6).getDateCellValue();
             person.setDateOfEmployment(date);
-            date = row.getCell(7) != null ? parser.parse(row.getCell(7).getStringCellValue()) : null;
+            date = row.getCell(7) != null ? row.getCell(7).getDateCellValue() : null;
             person.setDateOfLeave(date);
             person.setSchedule(row.getCell(8).getStringCellValue());
             newPersons.add(person);
@@ -162,9 +197,10 @@ public class PersonBean {
 
     public void searchPersons() {
         Connection connection = DBUtils.getConnection();
+        Statement stmt = null;
         try {
             persons.clear();
-            Statement stmt = connection.createStatement();
+            stmt = connection.createStatement();
             String sql = "SELECT * FROM pallas.person p JOIN pallas.hours_type h ON p.hours_type = h.type WHERE 1=1";
             String name = searchCriteria.getName();
             if (name != null && !name.isEmpty()){
@@ -226,6 +262,13 @@ public class PersonBean {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }finally {
+            try {
+                stmt.close();
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -255,6 +298,7 @@ public class PersonBean {
 
     public void updatePerson(){
         Connection connection = DBUtils.getConnection();
+        PreparedStatement stmt = null;
         try {
             persons.clear();
 
@@ -270,7 +314,7 @@ public class PersonBean {
                     +",  schedule = ?"
                     +" WHERE id = ?"
                     + ";";
-            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt = connection.prepareStatement(sql);
             stmt.setString(1, editPerson.getName());
             stmt.setString(2,  editPerson.getLogin());
             stmt.setString(3, editPerson.getCity());
@@ -284,8 +328,74 @@ public class PersonBean {
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        }finally {
+            try {
+                stmt.close();
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         searchPersons();
+    }
+
+    public void showAddDialog(){
+        addedPerson = new PersonDTO();
+        RequestContext context = RequestContext.getCurrentInstance();
+        context.execute("PF('addWidget').show();");
+    }
+
+    public void exportToXls() throws IOException{
+        Workbook wb = new XSSFWorkbook();
+        Sheet sheet = wb.createSheet("Persons");
+        for (int i = 0;i< persons.size(); i++){
+            PersonDTO person = persons.get(i);
+            Row row = sheet.createRow(i);
+            Cell cell = row.createCell(0);
+            cell.setCellValue(person.getName());
+            cell = row.createCell(1);
+            cell.setCellValue(person.getLogin());
+            cell = row.createCell(2);
+            cell.setCellValue(person.getCity());
+            cell = row.createCell(3);
+            cell.setCellValue(person.getPosition());
+            cell = row.createCell(4);
+            cell.setCellValue(person.getPePayroll());
+            cell = row.createCell(5);
+            cell.setCellValue(person.getHoursType());
+
+            CellStyle cellStyle = wb.createCellStyle();
+            CreationHelper createHelper = wb.getCreationHelper();
+            cellStyle.setDataFormat(
+                    createHelper.createDataFormat().getFormat("dd/MM/yyyy"));
+            cell = row.createCell(6);
+            cell.setCellValue(person.getDateOfEmployment());
+            cell.setCellStyle(cellStyle);
+
+            cell = row.createCell(7);
+            if (person.getDateOfLeave() != null){
+                cellStyle = wb.createCellStyle();
+                createHelper = wb.getCreationHelper();
+                cellStyle.setDataFormat(
+                        createHelper.createDataFormat().getFormat("dd/MM/yyyy"));
+                cell.setCellValue(person.getDateOfLeave());
+                cell.setCellStyle(cellStyle);
+            }
+            cell = row.createCell(8);
+            cell.setCellValue(person.getSchedule());
+        }
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        wb.write(out);
+        InputStream stream = new ByteArrayInputStream(out.toByteArray());
+        file = new DefaultStreamedContent(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "exported_persons.xlsx");
+    }
+
+    public PersonDTO getAddedPerson() {
+        return addedPerson;
+    }
+
+    public void setAddedPerson(PersonDTO addedPerson) {
+        this.addedPerson = addedPerson;
     }
 
     public PersonDTO getEditPerson() {
@@ -310,6 +420,14 @@ public class PersonBean {
 
     public void setUploadedFile(UploadedFile uploadedFile) {
         this.uploadedFile = uploadedFile;
+    }
+
+    public StreamedContent getFile() {
+        return file;
+    }
+
+    public void setFile(StreamedContent file) {
+        this.file = file;
     }
 
     public PersonSearchCriteria getSearchCriteria() {

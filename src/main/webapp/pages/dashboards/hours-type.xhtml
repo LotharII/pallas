@@ -35,7 +35,16 @@
                     </p:commandLink>
                 </p:column>
             </p:dataTable>
-
+            <br/>
+            <div style="text-align: left;">
+                <p:commandLink action="#{hoursTypeBean.showAddDialog()}" update="hoursForm:addHours">
+                    <h:graphicImage library="img" name="Add.png" />
+                </p:commandLink>
+            </div>
+            <br/>
+            <div style="text-align: left;">
+                <h:commandButton value="Overview" action="#{navigation.goToOverview()}"/>
+            </div>
             <p:dialog id="editHours" widgetVar="editWidget" >
                 <h:outputText value="Edit Hours Type"/>
                 <br/>
@@ -70,20 +79,11 @@
                                      onclick="addHours.hide();" />
                 </span>
                 <span style="text-align: right">
-                    <p:commandButton value="Cancel" action="#{hoursTypeBean.hideEditDialog()}"
+                    <p:commandButton value="Cancel"
                                      onclick="addHours.hide();"/>
                 </span>
              </p:dialog>
-            <br/>
-            <div style="text-align: left;">
-                <p:commandLink action="#{hoursTypeBean.showAddDialog()}" update="hoursForm:addHours">
-                    <h:graphicImage library="img" name="Add.png" />
-                </p:commandLink>
-            </div>
-            <br/>
-            <div style="text-align: left;">
-                <h:commandButton value="Overview" action="#{navigation.goToOverview()}"/>
-            </div>
+
         </h:form>
     </div>
 </h:body>

@@ -25,9 +25,10 @@ public class HoursTypeBean {
 
     public void searchHoursType(){
         Connection connection = DBUtils.getConnection();
+        Statement stmt = null;
         try {
             hourTypes.clear();
-            Statement stmt = connection.createStatement();
+            stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT * FROM pallas.hours_type");
             while (rs.next()) {
                 HourTypeDTO hourTypeDTO = new HourTypeDTO();
@@ -37,51 +38,82 @@ public class HoursTypeBean {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                stmt.close();
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     public void addHourType(){
         Connection connection = DBUtils.getConnection();
+        PreparedStatement stmt = null;
         try {
             String sql = "INSERT INTO pallas.hours_type "
                     + "(amount, type) VALUES"
                     + "(?,?)";
-            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt = connection.prepareStatement(sql);
             stmt.setInt(1, addType.getAmount());
             stmt.setString(2, addType.getType());
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                stmt.close();
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         searchHoursType();
     }
 
     public void updateHoursType(){
         Connection connection = DBUtils.getConnection();
+        PreparedStatement stmt = null;
         try {
             String sql = "UPDATE pallas.hours_type "
                     +" SET amount = ?"
                     +" WHERE type = ?"
                     + ";";
-            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt = connection.prepareStatement(sql);
             stmt.setInt(1, editHours.getAmount());
             stmt.setString(2, editHours.getType());
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                stmt.close();
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         searchHoursType();
     }
 
     public void delete(HourTypeDTO hours){
         Connection connection = DBUtils.getConnection();
+        Statement stmt = null;
         try {
-            Statement stmt = connection.createStatement();
+            stmt = connection.createStatement();
             String sql = "DELETE FROM pallas.hours_type " +
                     "WHERE type = '" + hours.getType() +"';";;
             stmt.execute(sql);
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                stmt.close();
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         searchHoursType();
     }

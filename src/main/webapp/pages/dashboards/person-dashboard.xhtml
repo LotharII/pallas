@@ -95,16 +95,75 @@
                 </p:column>
 
             </p:dataTable>
+            <br/>
+            <div style="text-align: left;">
+                <p:commandLink action="#{personBean.showAddDialog()}" update="personForm:addedPerson">
+                    <h:graphicImage library="img" name="Add.png" />
+                </p:commandLink>
+            </div>
+            <br/>
+
+            <div style="text-align: left">
+                <p:fileUpload mode="simple" value="#{personBean.uploadedFile}" />
+                <p:commandButton value="Upload" action="#{personBean.upload()}" ajax="false" />
+            </div>
+            
+            <br/>
+            <div style="text-align: left;">
+
+                <p:commandButton value="Export to XLS" ajax="false" actionListener="#{personBean.exportToXls()}">
+                    <p:fileDownload value="#{personBean.file}" />
+                </p:commandButton>
+            </div>
+
+            <br/>
+            <div style="text-align: left;">
+                <h:commandButton value="Overview" action="#{navigation.goToOverview()}"/>
+            </div>
             <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
                 <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
                 <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
             </p:confirmDialog>
 
-            <br/>
-            <div style="text-align: left">
-                <p:fileUpload mode="simple" value="#{personBean.uploadedFile}" />
-                <p:commandButton value="Upload" action="#{personBean.upload()}" ajax="false" />
-            </div>
+            <p:dialog id="addedPerson" widgetVar="addWidget" >
+                <h:outputText value="Add New Person"/>
+                <br/>
+                <p:panelGrid columns="2">
+                    <h:outputText value="Name:"/>
+                    <p:inputText value="#{personBean.addedPerson.name}"/>
+                    <h:outputText value="Login:"/>
+                    <p:inputText value="#{personBean.addedPerson.login}"/>
+                    <h:outputText value="City:"/>
+                    <p:inputText value="#{personBean.addedPerson.city}"/>
+                    <h:outputText value="Position:"/>
+                    <p:inputText value="#{personBean.addedPerson.position}"/>
+                    <h:outputText value="PE/Payroll"/>
+                    <p:inputText value="#{personBean.addedPerson.pePayroll}"/>
+                    <h:outputText value="Hours type:"/>
+                    <p:selectOneMenu value="#{personBean.addedPerson.hoursType}">
+                        <f:selectItems value="#{personBean.hourTypes}" var="type"
+                                       itemLabel="#{type.type}" itemValue="#{type.type}"/>
+                    </p:selectOneMenu>
+                    <h:outputText value="Date of Employment:"/>
+                    <p:calendar  showOn="button"  value="#{personBean.addedPerson.dateOfEmployment}"
+                                 pattern="dd/MM/yyyy" />
+                    <h:outputText value="Date of Leave:"/>
+                    <p:calendar  showOn="button"  value="#{personBean.addedPerson.dateOfLeave}"
+                                 pattern="dd/MM/yyyy" />
+                    <h:outputText value="Schedule:"/>
+                    <p:inputText value="#{personBean.addedPerson.schedule}"/>
+                </p:panelGrid>
+                <br/>
+                <span style="text-align: left">
+                    <p:commandButton value="Add New Person" action="#{personBean.addPerson()}"
+                                     onclick="addedPerson.hide();" />
+                </span>
+                <span style="text-align: right">
+                    <p:commandButton value="Cancel"
+                                     onclick="addedPerson.hide();"/>
+                </span>
+            </p:dialog>
+
             <p:dialog id="editPerson" widgetVar="editWidget" >
                 <p:panelGrid columns="2">
                     <h:outputText value="Name:"/>
@@ -137,10 +196,7 @@
                                  onclick="editPerson.hide();"/>
 
             </p:dialog>
-            <br/>
-            <div style="text-align: left;">
-                <h:commandButton value="Overview" action="#{navigation.goToOverview()}"/>
-            </div>
+
         </h:form>
     </div>
 </h:body>
