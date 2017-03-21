@@ -17,6 +17,11 @@
             <to-view-id>/pages/dashboards/hours-type.xhtml</to-view-id>
             <redirect/>
         </navigation-case>
+        <navigation-case>
+            <from-outcome>links</from-outcome>
+            <to-view-id>/pages/dashboards/link-dashboard.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
 
     </navigation-rule>
     <navigation-rule>
@@ -34,6 +39,36 @@
         <navigation-case>
             <from-outcome>overview</from-outcome>
             <to-view-id>/pages/index.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/pages/dashboards/link-dashboard.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>overview</from-outcome>
+            <to-view-id>/pages/index.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>results</from-outcome>
+            <to-view-id>/pages/dashboards/link-result-dashboard.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/pages/dashboards/link-result-dashboard.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>overview</from-outcome>
+            <to-view-id>/pages/index.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>links</from-outcome>
+            <to-view-id>/pages/dashboards/link-dashboard.xhtml</to-view-id>
             <redirect/>
         </navigation-case>
 

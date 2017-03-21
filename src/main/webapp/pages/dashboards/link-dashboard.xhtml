@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core">
+<h:head>
+    <title>Link Dashboard</title>
+    <script>
+
+    </script>
+    <h:outputStylesheet library = "css" name="style.css"/>
+</h:head>
+<h:body>
+    <div id="page-wrap" >
+        <h:graphicImage library="img" name="mindy.png"/>
+        <br/>
+        <h:form id="linkForm" enctype="multipart/form-data">
+            <p:messages autoUpdate="true" />
+            <p:accordionPanel id="search" >
+                <p:tab id="searchTab" title="Search" >
+                    <p:panelGrid id="searchGrid" columns="6">
+                        <h:outputText style="margin-right: 20px" value="Name:"/>
+                        <p:inputText style="margin-right: 20px" value="#{linkDashboardBean.searchCriteria.name}"/>
+                        <h:outputText style="margin-right: 20px" value="Link:"/>
+                        <p:inputText style="margin-right:20px;" value="#{linkDashboardBean.searchCriteria.link}"/>
+                        <h:outputText style="margin-right: 20px" value="K-Factor:"/>
+                        <p:inputText style="margin-right: 20px" value="#{linkDashboardBean.searchCriteria.kFactor}"/>
+                        <h:outputText style="margin-right: 20px" value="Tag:"/>
+                        <p:inputText style="margin-right: 20px" value="#{linkDashboardBean.searchCriteria.tag}"/>
+                        <h:outputText style="margin-right: 20px" value="Type:"/>
+                        <p:inputText style="margin-right: 20px" value="#{linkDashboardBean.searchCriteria.type}"/>
+                        <h:outputText style="margin-right: 20px" value="Start Date:"/>
+                        <p:calendar  showOn="button"  value="#{linkDashboardBean.searchCriteria.startDate}"
+                                     pattern="dd/MM/yyyy" />
+                        <h:outputText style="margin-right: 20px" value="End Date:"/>
+                        <p:calendar  showOn="button"  value="#{linkDashboardBean.searchCriteria.endDate}"
+                                     pattern="dd/MM/yyyy" />
+                    </p:panelGrid>
+                    <br/>
+                    <div style="text-align: left">
+                        <p:commandButton style="margin-right: 20px;" value="Search" action="#{linkDashboardBean.searchLinks()}" update="linkForm:linkTable"/>
+                        <p:commandButton  value="Clear Search Results" action="#{linkDashboardBean.clear()}" update="linkForm:linkTable linkForm:search:searchGrid"/>
+                    </div>
+                </p:tab>
+            </p:accordionPanel>
+            <br/>
+            <p:dataTable id="linkTable"
+                         value="#{linkDashboardBean.links}"
+                         var="link"
+                         tableStyle="width:1200px">
+                <p:column headerText="Name">
+                    <p:commandLink value="#{link.name}"  action="#{linkDashboardBean.showResults(link)}" />
+                </p:column>
+                <p:column headerText="Link">
+                    <h:outputText value="#{link.link}"/>
+                </p:column>
+                <p:column headerText="K-Factor">
+                    <h:outputText value="#{link.kFactor}"/>
+                </p:column>
+                <p:column headerText="Picture Quantity">
+                    <h:outputText value="#{link.pictureQuantity}"/>
+                </p:column>
+                <p:column headerText="Tag">
+                    <h:outputText value="#{link.tag}"/>
+                </p:column>
+                <p:column headerText="Type">
+                    <h:outputText value="#{link.type}"/>
+                </p:column>
+                <p:column headerText="Start Date">
+                    <h:outputText value="#{link.startDate}" >
+                        <f:convertDateTime type="date" pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+
+                </p:column>
+                <p:column headerText="End Date">
+                    <h:outputText value="#{link.endDate}" >
+                        <f:convertDateTime type="date" pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Action">
+                    <p:commandLink style="margin-right: 10px;" action="#{linkDashboardBean.showEditDialog(link)}" update="linkForm:editLink">
+                        <h:graphicImage library="img" name="edit.png" />
+                    </p:commandLink>
+                    <p:commandLink action="#{linkDashboardBean.deleteLink(link)}" update="linkForm:linkTable">
+                        <p:confirm header="Confirmation" message="Are you sure?" icon="ui-icon-alert" />
+                        <h:graphicImage library="img" name="delete.png" />
+                    </p:commandLink>
+                </p:column>
+
+            </p:dataTable>
+            <br/>
+            <div style="text-align: left;">
+                <p:commandLink action="#{linkDashboardBean.showAddDialog()}" update="linkForm:addedLink">
+                    <h:graphicImage library="img" name="Add.png" />
+                </p:commandLink>
+            </div>
+            <br/>
+
+            <div style="text-align: left">
+                <p:fileUpload mode="simple" value="#{linkDashboardBean.uploadedFile}" />
+                <p:commandButton value="Upload" action="#{linkDashboardBean.upload()}" ajax="false" style="margin-right: 30px;"/>
+                <p:commandButton value="Export to XLS" ajax="false" actionListener="#{linkDashboardBean.exportToXls()}">
+                    <p:fileDownload value="#{linkDashboardBean.file}" />
+                </p:commandButton>
+            </div>
+
+            <br/>
+            <div style="text-align: left;">
+                <h:commandButton value="Overview" action="#{navigation.goToOverview()}"/>
+            </div>
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+            </p:confirmDialog>
+
+            <p:dialog id="addedLink" widgetVar="addWidget" >
+                <h:outputText value="Add New Link"/>
+                <br/>
+                <p:panelGrid columns="2">
+                    <h:outputText value="Name:"/>
+                    <p:inputText value="#{linkDashboardBean.addedLink.name}"/>
+                    <h:outputText value="Link:"/>
+                    <p:inputText value="#{linkDashboardBean.addedLink.link}"/>
+                    <h:outputText value="K-Factor:"/>
+                    <p:inputText value="#{linkDashboardBean.addedLink.kFactor}"/>
+                    <h:outputText value="Tag:"/>
+                    <p:inputText value="#{linkDashboardBean.addedLink.tag}"/>
+                    <h:outputText value="Type:"/>
+                    <p:inputText value="#{linkDashboardBean.addedLink.type}"/>
+                    <h:outputText value="Start Date:"/>
+                    <p:calendar  showOn="button"  value="#{linkDashboardBean.addedLink.startDate}"
+                                 pattern="dd/MM/yyyy" />
+                    <h:outputText value="End Date:"/>
+                    <p:calendar  showOn="button"  value="#{linkDashboardBean.addedLink.endDate}"
+                                 pattern="dd/MM/yyyy" />
+                </p:panelGrid>
+                <br/>
+                <span style="text-align: left">
+                    <p:commandButton value="Add New Link" style="margin-right: 140px;" action="#{linkDashboardBean.addLink()}"
+                                     onclick="addedLink.hide();" />
+                </span>
+                <span style="text-align: right">
+                    <p:commandButton value="Cancel"
+                                     onclick="addedLink.hide();"/>
+                </span>
+            </p:dialog>
+
+            <p:dialog id="editLink" widgetVar="editWidget" >
+                <p:panelGrid columns="2">
+                    <h:outputText value="Name:"/>
+                    <p:inputText value="#{linkDashboardBean.editLink.name}"/>
+                    <h:outputText value="Link:"/>
+                    <p:inputText value="#{linkDashboardBean.editLink.link}"/>
+                    <h:outputText value="K-Factor:"/>
+                    <p:inputText value="#{linkDashboardBean.editLink.kFactor}"/>
+                    <h:outputText value="Tag:"/>
+                    <p:inputText value="#{linkDashboardBean.editLink.tag}"/>
+                    <h:outputText value="Type:"/>
+                    <p:inputText value="#{linkDashboardBean.editLink.type}"/>
+                    <h:outputText value="Start Date:"/>
+                    <p:calendar  showOn="button"  value="#{linkDashboardBean.editLink.startDate}"
+                                 pattern="dd/MM/yyyy" />
+                    <h:outputText value="End Date:"/>
+                    <p:calendar  showOn="button"  value="#{linkDashboardBean.editLink.endDate}"
+                                 pattern="dd/MM/yyyy" />
+                </p:panelGrid>
+                <br/>
+                <p:commandButton value="Save Changes" style="margin-right: 140px;" action="#{linkDashboardBean.updateLink()}"
+                                 onclick="editLink.hide();" />
+                <p:commandButton value="Cancel" action="#{linkDashboardBean.hideEditDialog()}"
+                                 onclick="editLink.hide();"/>
+
+            </p:dialog>
+
+        </h:form>
+    </div>
+</h:body>
+</html>

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core">
+<h:head>
+    <title>Results Dashboard</title>
+    <script>
+
+    </script>
+    <h:outputStylesheet library = "css" name="style.css"/>
+</h:head>
+<h:body>
+    <div id="page-wrap" >
+        <h:graphicImage library="img" name="mindy.png"/>
+        <br/>
+        <h:form id="linkResultForm" enctype="multipart/form-data">
+            <p:messages autoUpdate="true" />
+            <br/>
+            <h:outputText style="margin-right: 20px" value="Start Date:"/>
+            <p:calendar  showOn="button"  value="#{linkResultDashboardBean.searchStartDate}"
+                         pattern="dd/MM/yyyy" />
+            <h:outputText style="margin-right: 20px" value="End Date:"/>
+            <p:calendar  showOn="button"  value="#{linkResultDashboardBean.searchEndDate}"
+                         pattern="dd/MM/yyyy" />
+            <br/>
+            <div style="text-align: left">
+                <p:commandButton style="margin-right: 20px;" value="Search" action="#{linkResultDashboardBean.searchResults()}"
+                                 update="linkResultForm:linkTable"/>
+            </div>
+            <br/>
+            <p:dataTable id="linkTable"
+                         value="#{linkResultDashboardBean.linkResults}"
+                         var="result"
+                         tableStyle="width:1200px">
+                <p:column headerText="Link Name">
+                    <h:outputText value="#{result.linkName}"/>
+                </p:column>
+                <p:column headerText="Person Name">
+                    <h:outputText value="#{result.personName}"/>
+                </p:column>
+                <p:column headerText="Hours Spent">
+                    <h:outputText value="#{result.hoursSpent}"/>
+                </p:column>
+                <p:column headerText="Payment">
+                    <h:outputText value="#{result.payment}"/>
+                </p:column>
+                <p:column headerText="Login">
+                    <h:outputText value="#{result.login}"/>
+                </p:column>
+                <p:column headerText="Quantity">
+                    <h:outputText value="#{result.quantity}"/>
+                </p:column>
+                <p:column headerText="K-Factor">
+                    <h:outputText value="#{result.kFactor}"/>
+                </p:column>
+                <p:column headerText="Tag">
+                    <h:outputText value="#{result.tag}"/>
+                </p:column>
+                <p:column headerText="Type">
+                    <h:outputText value="#{result.type}"/>
+                </p:column>
+                <p:column headerText="Start Date">
+                    <h:outputText value="#{result.startDate}" >
+                        <f:convertDateTime type="date" pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+
+                </p:column>
+                <p:column headerText="End Date">
+                    <h:outputText value="#{result.endDate}" >
+                        <f:convertDateTime type="date" pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Action">
+                    <p:commandLink style="margin-right: 10px;" action="#{linkResultDashboardBean.showEditDialog(result)}" update="linkResultForm:editResult">
+                        <h:graphicImage library="img" name="edit.png" />
+                    </p:commandLink>
+                    <p:commandLink action="#{linkResultDashboardBean.deleteLink(result)}" update="linkResultForm:linkTable">
+                        <p:confirm header="Confirmation" message="Are you sure?" icon="ui-icon-alert" />
+                        <h:graphicImage library="img" name="delete.png" />
+                    </p:commandLink>
+                </p:column>
+
+            </p:dataTable>
+            <br/>
+            <div style="text-align: left;">
+                <p:commandLink action="#{linkResultDashboardBean.showAddDialog()}" update="linkResultForm:addedLinkResult">
+                    <h:graphicImage library="img" name="Add.png" />
+                </p:commandLink>
+            </div>
+            <br/>
+
+            <div style="text-align: left">
+                <p:fileUpload mode="simple" value="#{linkResultDashboardBean.uploadedFile}" />
+                <p:commandButton style="margin-right: 30px" value="Upload" action="#{linkResultDashboardBean.upload()}" ajax="false" />
+                <p:commandButton value="Export to XLS" ajax="false" actionListener="#{linkResultDashboardBean.exportToXls()}">
+                    <p:fileDownload value="#{linkResultDashboardBean.file}" />
+                </p:commandButton>
+            </div>
+
+            <br/>
+            <div style="text-align: left;">
+                <h:commandButton value="Overview" action="#{navigation.goToOverview()}" style="margin-right: 30px"/>
+                <h:commandButton value="Back" action="#{navigation.goToLinksDashboard()}"/>
+            </div>
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+            </p:confirmDialog>
+
+            <p:dialog id="addedLinkResult" widgetVar="addWidget" >
+                <h:outputText value="Add New Link"/>
+                <br/>
+                <p:panelGrid columns="2">
+                    <h:outputText value="Person Name:"/>
+                    <p:inputText value="#{linkResultDashboardBean.addedLinkResult.personName}"/>
+                    <h:outputText value="Hours Spent:"/>
+                    <p:inputText value="#{linkResultDashboardBean.addedLinkResult.hoursSpent}"/>
+                    <h:outputText value="Payment:"/>
+                    <p:inputText value="#{linkResultDashboardBean.addedLinkResult.payment}"/>
+                    <h:outputText value="Login:"/>
+                    <p:inputText value="#{linkResultDashboardBean.addedLinkResult.login}"/>
+                    <h:outputText value="Quantity:"/>
+                    <p:inputText value="#{linkResultDashboardBean.addedLinkResult.quantity}"/>
+                    <h:outputText value="K-Factor:"/>
+                    <p:inputText value="#{linkResultDashboardBean.addedLinkResult.kFactor}"/>
+                    <h:outputText value="Tag:"/>
+                    <p:inputText value="#{linkResultDashboardBean.addedLinkResult.tag}"/>
+                    <h:outputText value="Start Date:"/>
+                    <p:calendar  showOn="button"  value="#{linkResultDashboardBean.addedLinkResult.startDate}"
+                                 pattern="dd/MM/yyyy" />
+                    <h:outputText value="End Date:"/>
+                    <p:calendar  showOn="button"  value="#{linkResultDashboardBean.addedLinkResult.endDate}"
+                                 pattern="dd/MM/yyyy" />
+                </p:panelGrid>
+                <br/>
+                <span style="text-align: left">
+                    <p:commandButton value="Add New Result" style="margin-right: 140px;" action="#{linkResultDashboardBean.addLinkResult()}"
+                                     onclick="addedLinkResult.hide();" />
+                </span>
+                <span style="text-align: right">
+                    <p:commandButton value="Cancel"
+                                     onclick="addedLinkResult.hide();"/>
+                </span>
+            </p:dialog>
+
+            <p:dialog id="editResult" widgetVar="editWidget" >
+                <p:panelGrid columns="2">
+                    <h:outputText value="Link Name:"/>
+                    <p:inputText value="#{linkResultDashboardBean.editLinkResult.linkName}"/>
+                    <h:outputText value="Person Name:"/>
+                    <p:inputText value="#{linkResultDashboardBean.editLinkResult.personName}"/>
+                    <h:outputText value="Hours Spent:"/>
+                    <p:inputText value="#{linkResultDashboardBean.editLinkResult.hoursSpent}"/>
+                    <h:outputText value="Payment:"/>
+                    <p:inputText value="#{linkResultDashboardBean.editLinkResult.payment}"/>
+                    <h:outputText value="Login:"/>
+                    <p:inputText value="#{linkResultDashboardBean.editLinkResult.login}"/>
+                    <h:outputText value="Quantity:"/>
+                    <p:inputText value="#{linkResultDashboardBean.editLinkResult.quantity}"/>
+                    <h:outputText value="K-Factor:"/>
+                    <p:inputText value="#{linkResultDashboardBean.editLinkResult.kFactor}"/>
+                    <h:outputText value="Tag:"/>
+                    <p:inputText value="#{linkResultDashboardBean.editLinkResult.tag}"/>
+                    <h:outputText value="Type:"/>
+                    <p:inputText value="#{linkResultDashboardBean.editLinkResult.type}"/>
+                    <h:outputText value="Start Date:"/>
+                    <p:calendar  showOn="button"  value="#{linkResultDashboardBean.editLinkResult.startDate}"
+                                 pattern="dd/MM/yyyy" />
+                    <h:outputText value="End Date:"/>
+                    <p:calendar  showOn="button"  value="#{linkResultDashboardBean.editLinkResult.endDate}"
+                                 pattern="dd/MM/yyyy" />
+                </p:panelGrid>
+                <br/>
+                <p:commandButton value="Save Changes" style="margin-right: 140px;" action="#{linkResultDashboardBean.updateResult()}"
+                                 onclick="editResult.hide();" />
+                <p:commandButton value="Cancel" action="#{linkResultDashboardBean.hideEditDialog()}"
+                                 onclick="editResult.hide();"/>
+
+            </p:dialog>
+
+        </h:form>
+    </div>
+</h:body>
+</html>

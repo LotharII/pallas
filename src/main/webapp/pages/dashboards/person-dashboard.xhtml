@@ -51,7 +51,7 @@
             <p:dataTable id="personTable"
                          value="#{personBean.persons}"
                          var="person"
-                         tableStyle="width:auto">
+                         tableStyle="width:1200px">
                 <p:column headerText="Name">
                     <h:outputText value="#{person.name}"/>
                 </p:column>
@@ -154,14 +154,10 @@
                     <p:inputText value="#{personBean.addedPerson.schedule}"/>
                 </p:panelGrid>
                 <br/>
-                <span style="text-align: left">
-                    <p:commandButton value="Add New Person" action="#{personBean.addPerson()}"
+                    <p:commandButton value="Add New Person" style="margin-right: 140px;" action="#{personBean.addPerson()}"
                                      onclick="addedPerson.hide();" />
-                </span>
-                <span style="text-align: right">
                     <p:commandButton value="Cancel"
                                      onclick="addedPerson.hide();"/>
-                </span>
             </p:dialog>
 
             <p:dialog id="editPerson" widgetVar="editWidget" >
@@ -190,7 +186,8 @@
                     <h:outputText value="Schedule:"/>
                     <p:inputText value="#{personBean.editPerson.schedule}"/>
                 </p:panelGrid>
-                <p:commandButton value="Save Changes" action="#{personBean.updatePerson()}"
+                <br/>
+                <p:commandButton value="Save Changes" style="margin-right: 140px;" action="#{personBean.updatePerson()}"
                                  onclick="editPerson.hide();" />
                 <p:commandButton value="Cancel" action="#{personBean.hideEditDialog()}"
                                  onclick="editPerson.hide();"/>
