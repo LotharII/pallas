@@ -5,16 +5,24 @@ import com.mindysupports.dto.LinkSearchCriteria;
 import com.mindysupports.util.Constants;
 import com.mindysupports.util.DBUtils;
 import com.mindysupports.util.NavigationPath;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.context.RequestContext;
+import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.Date;
+import java.util.*;
 
 @ViewScoped
 @ManagedBean(name = "linkDashboardBean")
@@ -46,7 +54,7 @@ public class LinkDashboardBean {
             String sql = "SELECT * FROM pallas.link p WHERE 1=1";
             String name = searchCriteria.getName();
             if (name != null && !name.isEmpty()){
-                sql = sql + " AND p.person_name LIKE '%" + name + "%' ";
+                sql = sql + " AND p.name LIKE '%" + name + "%' ";
             }
             String link = searchCriteria.getLink();
             if (link != null && !link.isEmpty()){
@@ -155,23 +163,23 @@ public class LinkDashboardBean {
         searchLinks();
     }
 
-    public void insertPersonsBatch(List<LinkDTO> links) {
+    public void insertLinksBatch(List<LinkDTO> links) {
         Connection connection = DBUtils.getConnection();
         PreparedStatement ps = null;
         try {
             connection.setAutoCommit(false);
             String query = "INSERT INTO pallas.link (name, link, k_factor, " +
-                    "tag, start_date, end_date, type,) " +
+                    "tag, start_date, end_date, type) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
             ps = connection.prepareStatement(query);
             for (LinkDTO link : links){
-                ps.setString(1, addedLink.getName());
-                ps.setString(2, addedLink.getLink());
-                ps.setLong(3, addedLink.getkFactor());
-                ps.setString(4, addedLink.getTag());
-                ps.setTimestamp(5, new Timestamp(addedLink.getStartDate().getTime()));
-                ps.setTimestamp(6, new Timestamp(addedLink.getEndDate().getTime()));
-                ps.setString(7, addedLink.getType());
+                ps.setString(1, link.getName());
+                ps.setString(2, link.getLink());
+                ps.setLong(3, link.getkFactor());
+                ps.setString(4, link.getTag());
+                ps.setTimestamp(5, new Timestamp(link.getStartDate().getTime()));
+                ps.setTimestamp(6, new Timestamp(link.getEndDate().getTime()));
+                ps.setString(7, link.getType());
                 ps.addBatch();
             }
             ps.executeBatch();
@@ -227,11 +235,76 @@ public class LinkDashboardBean {
         searchLinks();
     }
 
-    public void exportToXls(){
+    public void exportToXls() throws IOException {
+        Workbook wb = new XSSFWorkbook();
+        Sheet sheet = wb.createSheet("Links");
+        for (int i = 0;i< links.size(); i++){
+            LinkDTO link = links.get(i);
+            Row row = sheet.createRow(i);
+            Cell cell = row.createCell(0);
+            cell.setCellValue(link.getName());
+            cell = row.createCell(1);
+            cell.setCellValue(link.getLink());
+            cell = row.createCell(2);
+            cell.setCellValue(link.getkFactor());
+            cell = row.createCell(3);
+            cell.setCellValue(link.getPictureQuantity());
+            cell = row.createCell(4);
+            cell.setCellValue(link.getTag());
+            cell = row.createCell(5);
+            cell.setCellValue(link.getType());
+            CellStyle cellStyle = wb.createCellStyle();
+            CreationHelper createHelper = wb.getCreationHelper();
+            cellStyle.setDataFormat(
+                    createHelper.createDataFormat().getFormat("dd/MM/yyyy"));
+            cell = row.createCell(6);
+            cell.setCellValue(link.getStartDate());
+            cell.setCellStyle(cellStyle);
+
+            cell = row.createCell(7);
+            cellStyle = wb.createCellStyle();
+            createHelper = wb.getCreationHelper();
+            cellStyle.setDataFormat(
+                    createHelper.createDataFormat().getFormat("dd/MM/yyyy"));
+            cell.setCellValue(link.getEndDate());
+            cell.setCellStyle(cellStyle);
+        }
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        wb.write(out);
+        InputStream stream = new ByteArrayInputStream(out.toByteArray());
+        file = new DefaultStreamedContent(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "exported_links.xlsx");
 
     }
 
-    public void upload(){
+    public void upload() {
+        try {
+            InputStream contents = uploadedFile.getInputstream();
+            Workbook wb = WorkbookFactory.create(contents);
+            Sheet sheet = wb.getSheetAt(0);
+            List<LinkDTO> newLinks = new ArrayList<LinkDTO>();
+            for (Row row : sheet) {
+                if (row.getPhysicalNumberOfCells() < 7){
+                    break;
+                }
+                LinkDTO link = new LinkDTO();
+                link.setName(row.getCell(0).getStringCellValue());
+                link.setLink(row.getCell(1).getStringCellValue());
+                link.setkFactor(Double.valueOf(row.getCell(2).getNumericCellValue()).longValue());
+                link.setPictureQuantity(Double.valueOf(row.getCell(3).getNumericCellValue()).longValue());
+                link.setTag(row.getCell(4).getStringCellValue());
+                link.setType(row.getCell(5).getStringCellValue());
+                java.util.Date date = row.getCell(6).getDateCellValue();
+                link.setStartDate(date);
+                date = row.getCell(7).getDateCellValue();
+                link.setEndDate(date);
+                newLinks.add(link);
+            }
+            insertLinksBatch(newLinks);
+            searchLinks();
+        } catch (Exception e){
+            FacesContext.getCurrentInstance().addMessage("Can not upload file",
+                    new FacesMessage("Can not upload file", "Can not upload file"));
+        }
 
     }
 
